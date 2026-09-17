@@ -1,0 +1,19 @@
+{
+  "name": "playwright-demo-qa",
+  "version": "1.0.0",
+  "description": "Demo project: Playwright Web + API tests, CI/CD, intentional failing test",
+  "scripts": {
+    "test": "npx playwright test",
+    "test:web": "npx playwright test tests/web/",
+    "test:api": "npx playwright test tests/api/",
+    "test:headed": "npx playwright test --headed",
+    "test:report": "npx playwright show-report",
+    "test:failing": "npx playwright test tests/web/failing-example.spec.js --reporter=list"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.48.0"
+  },
+  "keywords": ["playwright", "qa", "automation", "e2e", "api"],
+  "author": "QA Automation Engineer",
+  "license": "MIT"
+}
