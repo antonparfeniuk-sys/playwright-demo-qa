@@ -6,12 +6,10 @@ class TodoPage {
     this.page = page;
     this.newTodoInput = page.getByPlaceholder('What needs to be done?');
     this.todoItems = page.getByTestId('todo-item');
-    this.todoCount = page.getByTestId('todo-count');
-    this.clearCompletedBtn = page.getByRole('button', { name: 'Clear completed' });
-    this.toggleAll = page.getByLabel('Mark all as complete');
+    this.clearCompletedButton = page.getByRole('button', { name: 'Clear completed' });
   }
 
-  async goto() {
+  async open() {
     await this.page.goto('/todomvc/');
   }
 
@@ -20,21 +18,25 @@ class TodoPage {
     await this.newTodoInput.press('Enter');
   }
 
-  async addTodos(texts) {
-    for (const text of texts) {
-      await this.addTodo(text);
+  async addTodos(todoList) {
+    for (const todo of todoList) {
+      await this.addTodo(todo);
     }
   }
 
-  async getTodoCount() {
-    return this.todoItems.count();
-  }
-
-  async completeTodoByIndex(index) {
+  async completeTodo(index = 0) {
     await this.todoItems.nth(index).getByRole('checkbox').check();
   }
 
-  async getVisibleTodosText() {
+  async clearCompleted() {
+    await this.clearCompletedButton.click();
+  }
+
+  async getTodosCount() {
+    return this.todoItems.count();
+  }
+
+  async getTodosTexts() {
     return this.todoItems.allTextContents();
   }
 }
