@@ -11,9 +11,16 @@
     "test:failing": "npx playwright test tests/web/failing-example.spec.js --reporter=list"
   },
   "devDependencies": {
-    "@playwright/test": "^1.48.0"
+    "@playwright/test": "^1.48.0",
+    "csv-parse": "^7.0.2"
   },
-  "keywords": ["playwright", "qa", "automation", "e2e", "api"],
+  "keywords": [
+    "playwright",
+    "qa",
+    "automation",
+    "e2e",
+    "api"
+  ],
   "author": "QA Automation Engineer",
   "license": "MIT"
 }
