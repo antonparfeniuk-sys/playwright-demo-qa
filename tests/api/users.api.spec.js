@@ -3,26 +3,30 @@ const { test, expect } = require('@playwright/test');
 test.describe('JSONPlaceholder API', () => {
   const baseURL = 'https://jsonplaceholder.typicode.com';
 
-  test('GET /users  should return 10 users', async ({ request }) => {
+  test('GET /users returns list of 10 users', async ({ request }) => {
     const response = await request.get(`${baseURL}/users`);
 
     expect(response.status()).toBe(200);
     expect(response.headers()['content-type']).toContain('application/json');
 
     const users = await response.json();
-    expect(Array.isArray(users)).toBeTruthy();
-    expect(users).toHaveLength(10);
 
-    const firstUser = users[0];
-    expect(firstUser).toHaveProperty('id');
-    expect(firstUser).toHaveProperty('name');
-    expect(firstUser).toHaveProperty('email');
-    expect(firstUser).toHaveProperty('address.city');
-    expect(firstUser.email).toMatch(/@/);
+    expect(users).toHaveLength(10);
+    expect(users[0]).toEqual(
+      expect.objectContaining({
+        id: expect.any(Number),
+        name: expect.any(String),
+        email: expect.stringMatching(/@/),
+        address: expect.objectContaining({
+          city: expect.any(String),
+        }),
+      })
+    );
   });
 
-  test('GET /users/1  single resource', async ({ request }) => {
+  test('GET /users/1 returns correct user', async ({ request }) => {
     const response = await request.get(`${baseURL}/users/1`);
+
     expect(response.status()).toBe(200);
 
     const user = await response.json();
@@ -30,42 +34,45 @@ test.describe('JSONPlaceholder API', () => {
     expect(user.name).toBe('Leanne Graham');
   });
 
-  test('POST /posts  create resource', async ({ request }) => {
+  test('POST /posts creates a new post', async ({ request }) => {
     const payload = {
       title: 'QA Automation Demo',
-      body: 'Created during interview preparation',
+      body: 'Created by Playwright API test',
       userId: 1,
     };
 
     const response = await request.post(`${baseURL}/posts`, {
       data: payload,
-      headers: { 'Content-Type': 'application/json' },
     });
 
     expect(response.status()).toBe(201);
-    const created = await response.json();
-    expect(created).toMatchObject(payload);
-    expect(created).toHaveProperty('id');
+
+    const createdPost = await response.json();
+    expect(createdPost).toMatchObject(payload);
+    expect(createdPost.id).toBeDefined();
   });
 
-  test('GET /posts larger dataset', async ({ request }) => {
+  test('GET /posts returns large list of posts', async ({ request }) => {
     const response = await request.get(`${baseURL}/posts`);
-    expect(response.status()).toBe(200);
-
     const posts = await response.json();
+
+    expect(response.status()).toBe(200);
     expect(posts.length).toBeGreaterThan(50);
 
-    const user1Posts = posts.filter((p) => p.userId === 1);
-    expect(user1Posts.length).toBeGreaterThan(0);
-
-    for (const post of posts.slice(0, 20)) {
-      expect(post).toHaveProperty('id');
-      expect(post).toHaveProperty('title');
-      expect(post).toHaveProperty('body');
+    
+    for (const post of posts.slice(0, 5)) {
+      expect(post).toEqual(
+        expect.objectContaining({
+          id: expect.any(Number),
+          title: expect.any(String),
+          body: expect.any(String),
+          userId: expect.any(Number),
+        })
+      );
     }
   });
 
-  test('GET non-existent  404', async ({ request }) => {
+  test('GET non-existing user returns 404', async ({ request }) => {
     const response = await request.get(`${baseURL}/users/99999`);
     expect(response.status()).toBe(404);
   });

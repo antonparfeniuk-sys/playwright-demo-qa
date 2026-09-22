@@ -1,48 +1,50 @@
 const { test, expect } = require('@playwright/test');
 const { TodoPage } = require('../../pages/TodoPage');
 
-test.describe('TodoMVC - Web E2E', () => {
+test.describe('TodoMVC – Web E2E', () => {
+  /** @type {TodoPage} */
   let todoPage;
 
   test.beforeEach(async ({ page }) => {
     todoPage = new TodoPage(page);
-    await todoPage.goto();
+    await todoPage.open();
   });
 
-  test('single todo', async () => {
+  test('User can add a single todo', async () => {
     await todoPage.addTodo('Buy milk');
+
     await expect(todoPage.todoItems).toHaveCount(1);
     await expect(todoPage.todoItems.first()).toContainText('Buy milk');
   });
 
-  test('should add multiple todos', async () => {
+  test('User can add multiple todos', async () => {
     const todos = [
-      'Task 1 - prepare test data',
-      'Task 2 - write API contract tests',
-      'Task 3 - setup CI pipeline',
-      'Task 4 - review regression suite',
-      'Task 5 - update documentation',
+      'Prepare test data',
+      'Write API tests',
+      'Setup CI pipeline',
+      'Review regression suite',
     ];
 
     await todoPage.addTodos(todos);
-    await expect(todoPage.todoItems).toHaveCount(todos.length);
 
-    const texts = await todoPage.getVisibleTodosText();
-    expect(texts).toEqual(expect.arrayContaining(todos));
+    await expect(todoPage.todoItems).toHaveCount(todos.length);
+    await expect(await todoPage.getTodosTexts()).toEqual(expect.arrayContaining(todos));
   });
 
-  test('should complete a todo and clear completed', async () => {
-    await todoPage.addTodo('Complete me');
-    await todoPage.completeTodoByIndex(0);
+  test('User can complete a todo and clear completed items', async () => {
+    await todoPage.addTodo('Complete this task');
+    await todoPage.completeTodo(0);
+
     await expect(todoPage.todoItems.first()).toHaveClass(/completed/);
 
-    await todoPage.clearCompletedBtn.click();
+    await todoPage.clearCompleted();
     await expect(todoPage.todoItems).toHaveCount(0);
   });
 
-  test('should persist todos after reload', async ({ page }) => {
+  test('Todos persist after page reload', async ({ page }) => {
     await todoPage.addTodo('Persistent todo');
     await page.reload();
+
     await expect(todoPage.todoItems).toHaveCount(1);
     await expect(todoPage.todoItems.first()).toContainText('Persistent todo');
   });

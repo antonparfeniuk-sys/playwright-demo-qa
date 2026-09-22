@@ -1,25 +1,28 @@
 const { test, expect } = require('@playwright/test');
 const { TodoPage } = require('../../pages/TodoPage');
 
-test.describe('Intentional failure demo', () => {
-  test('this test is designed to fail demonstrates error visibility', async ({ page }) => {
+// Ці тести спеціально падають.
+// Потрібні тільки для демонстрації помилок, скріншотів і відео.
+
+test.describe('Demo of failing tests', () => {
+  test('should fail with wrong text', async ({ page }) => {
     const todoPage = new TodoPage(page);
-    await todoPage.goto();
+    await todoPage.open();
 
-    await todoPage.addTodo('Check for fail ');
-    await expect(todoPage.todoItems).toHaveCount(1);
+    await todoPage.addTodo('I will fail');
 
-    // Expected Error
+    //expected error
     await expect(todoPage.todoItems.first()).toHaveText(
-      'Fail for demo',
+      'This text is wrong on purpose',
       { timeout: 3000 }
     );
   });
 
-  test('locator not found', async ({ page }) => {
+  test('should fail because element does not exist', async ({ page }) => {
     const todoPage = new TodoPage(page);
-    await todoPage.goto();
+    await todoPage.open();
 
-    await page.getByTestId('buttondemo').click({ timeout: 2000 });
+    //not usable button
+    await page.getByTestId('this-button-does-not-exist').click({ timeout: 2000 });
   });
 });

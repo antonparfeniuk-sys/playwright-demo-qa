@@ -4,26 +4,23 @@ const path = require('path');
 const { parse } = require('csv-parse/sync');
 const { TodoPage } = require('../../pages/TodoPage');
 
+// Читаємо дані з CSV
 const csvPath = path.join(__dirname, '../../data/todos.csv');
 const records = parse(fs.readFileSync(csvPath), {
   columns: true,
-  skip_empty_lines: true,
+  skip_empty_lines: true
 });
 
-test.describe('Data-driven tests from CSV', () => {
-  for (const record of records) {
-    test(`Todo from CSV: "${record.title}"`, async ({ page }) => {
+test.describe('Tests from CSV file', () => {
+  for (const row of records) {
+    test(`should add todo from CSV: ${row.title}`, async ({ page }) => {
       const todoPage = new TodoPage(page);
-      await todoPage.goto();
+      await todoPage.open();
 
-      await todoPage.addTodo(record.title);
+      await todoPage.addTodo(row.title);
 
-      if (record.shouldExist === 'true') {
-        await expect(todoPage.todoItems.filter({ hasText: record.title })).toHaveCount(1);
-      } else {
-        // Для демо просто перевіряємо, що елемент додався
-        await expect(todoPage.todoItems).toHaveCount(1);
-      }
+      await expect(todoPage.todoItems).toHaveCount(1);
+      await expect(todoPage.todoItems.first()).toContainText(row.title);
     });
   }
 });
