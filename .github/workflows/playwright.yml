@@ -1,5 +1,8 @@
-name: Playwright Tests (Web + API)
-
+- name: Run Web + API tests
+  run: npx playwright test --project=chromium --grep-invert "Demo of failing tests|Intentional failure demo"
+  env:
+    CI: true
+    
 on:
   push:
     branches: [main, master]
